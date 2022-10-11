@@ -1,5 +1,5 @@
-# tRNApore
-Analysis pipeline for tRNA data from single-channel nanopore. Updates to follow...
+# protpore
+Analysis pipeline for protein nanopore data. Updates to follow...
 
 # notes
-use networkx version 1.11
+use pythin 2.7 and networkx version 1.11
