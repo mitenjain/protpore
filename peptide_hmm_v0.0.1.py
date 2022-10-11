@@ -454,11 +454,9 @@ def main(myCommandLine=None):
             # Create list of segment means
             # (also write means/std to create profiles)
             # REMEMBER TO COMMENT OUT WHEN NOT MAKING NEW PROFILE FILES!
-            #
 #             print filename
 #             new_filename = str(filename.replace('/', '_'))
-#             writeFile = open('F5' + new_filename + str(min_gain_per_sample) + '.txt', 'w')
-#             writeFile = open('F5' + str(min_gain_per_sample) + '.txt', 'w')
+#             writeFile = open('F5_' + new_filename + str(min_gain_per_sample) + '.txt', 'w')
             for segment in event.segments:
                 segment_means.append(segment.mean)
 #                 writeFile.write(str(count)+'\t'+str(segment.mean)+'\t'+str(segment.std)+'\n')
@@ -470,27 +468,21 @@ def main(myCommandLine=None):
             
             # Align event to HMM
             pred = prediction(models, sequences, algorithm = 'viterbi')
-#             scores = [float(pred[0][0]), float(pred[1][0]), float(pred[2][0]), float(pred[3][0])] 
             scores = [float(pred[0][0])] 
             print event.start, event.end, scores
 
             classified_model = scores.index(max(scores))
-#             print classified_model
             label = 'P_pro001'
             if classified_model == 0 and label == 'P_pro001':
                 p_pro001 += 1
             num_events += 1
 
-#             print matrix
             matrix[label][classified_model] += 1
 
-            #for k in pred[classified_model][1]:
-                #print k[1].name
             # plot event according to model using plot_event:
             # top plot is segmented event colored in cycle by segments, bottom 
             # subplot is segmented event aligned with HMM, colored by states
             plot_event(filename, event, model=models[classified_model])
-#             plot_event_segments(filename, event)
 
             # iterate through rest of fileset
             i = i + 1
