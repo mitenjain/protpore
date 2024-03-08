@@ -63,6 +63,7 @@ pymysql.install_as_MySQLdb()
 import MySQLdb
 import itertools as it
 
+import datetime
 class Database( object ):
     '''
     Represents a SQL database. 

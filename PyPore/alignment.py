@@ -14,9 +14,9 @@ import numpy as np
 import math
 import itertools as it 
 
-from core import *
-from parsers import *
-from DataTypes import *
+from PyPore.core import *
+from PyPore.parsers import *
+from PyPore.DataTypes import *
 
 from PyPore.calignment import cSegmentAligner
 from yahmm import *
@@ -707,7 +707,7 @@ class ProfileAligner( object ):
 		# Follow the slave's path through master
 		for i, state in enumerate( states[1:-1] ):
 			sname = state[1].name
-			print sname
+			print(sname)
 
 class MultipleSequenceAligner( object ):
 	'''
