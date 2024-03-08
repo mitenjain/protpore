@@ -32,17 +32,17 @@ Event: A container for both the ionic current of a given event, and metadata, in
 '''
 
 import numpy as np
-from read_abf import *
+from PyPore.read_abf import *
 from matplotlib import pyplot as plt
-from hmm import *
-from core import *
-from database import *
-from parsers import *
-from alignment import *
+from PyPore.hmm import *
+from PyPore.core import *
+from PyPore.database import *
+from PyPore.parsers import *
+from PyPore.alignment import *
                  
 import json
 import time
-from itertools import chain, izip, tee, combinations
+from itertools import chain, tee, combinations
 import itertools as it
 import re
 
@@ -85,6 +85,9 @@ class MetaEvent( MetaSegment ):
         associated with the hidden states of a specific hmm passed in. Accepts all arguments that
         pyplot.plot accepts, and passes them along.
         '''
+
+        # Print the kwargs
+        print(kwargs)
 
         if hmm:
             if not hidden_states:
@@ -173,7 +176,7 @@ class MetaEvent( MetaSegment ):
             plt.fill_between( x, y_high(2), y_low(2), color=color, alpha=0.50 )
             plt.fill_between( x, y_high(3), y_low(3), color=color, alpha=0.30 )
         else:
-            for c, segment, l in it.izip_longest( color, self.segments, labels ):
+            for c, segment, l in it.zip_longest( color, self.segments, labels ):
                 x = ( segment.start, segment.duration+segment.start )
                 y_high = lambda z: segment.mean + z * segment.std
                 y_low = lambda z: segment.mean - z * segment.std
@@ -448,7 +451,7 @@ class Event( Segment ):
 
         # Otherwise plot them one segment at a time, colored appropriately.
         else:
-            for c, segment, l in it.izip_longest( color, self.segments, labels ):
+            for c, segment, l in it.zip_longest( color, self.segments, labels ):
                 plt.plot( np.arange(0, len( segment.current ) )/self.second + segment.start, 
                     segment.current, color=c, label=l, **kwargs )
 
@@ -458,7 +461,7 @@ class Event( Segment ):
 
             # If plotting the lines, plot the transitions from one segment to another
             if lines:
-                for seg, next_seg in it.izip( self.segments[:-1], self.segments[1:] ):
+                for seg, next_seg in it.zip( self.segments[:-1], self.segments[1:] ):
                     plt.plot( [seg.end, seg.end], [ seg.mean, next_seg.mean ], **line_kwargs )
 
         # If labels have been passed in, then add the legend.
@@ -967,12 +970,12 @@ class Experiment( object ):
         # are not open at the same time.
         for file in it.imap( File, self.filenames ):
             if verbose:
-                print "Opening {}".format( file.filename )
+                print("Opening {}".format( file.filename ))
 
             file.parse( parser=event_detector )
 
             if verbose:
-                print "\tDetected {} Events".format( file.n )
+                print("\tDetected {} Events".format( file.n ))
             
             # If using a segmenter, then segment all of the events in this file
             for i, event in enumerate( file.events ):
@@ -981,7 +984,7 @@ class Experiment( object ):
                 if segmenter is not None:
                     event.parse( parser=segmenter )
                     if verbose:
-                        print "\t\tEvent {} has {} segments".format( i+1, event.n )
+                        print("\t\tEvent {} has {} segments".format( i+1, event.n ))
 
             if meta:
                 file.to_meta()

@@ -31,7 +31,7 @@ from PyPore.alignment import *
                  
 import json
 import time
-from itertools import chain, izip, tee, combinations
+from itertools import chain, tee, combinations
 import itertools as it
 import re
 
@@ -213,14 +213,14 @@ class Event(Segment):
                 except:
                     # If using any other naming scheme, assign a color from the colormap
                     # to each state without any ordering, since none was specified.
-                    states = { hmm.states[i]: i for i in xrange( len(hmm.states) ) }
+                    states = { hmm.states[i]: i for i in range( len(hmm.states) ) }
                     hmm_color_cycle = [ cm( states[state] ) for i, state in hidden_states ]
 
         if 'color' in kwargs.keys(): # If the user has specified a scheme..
             color_arg = kwargs['color'] # Pull out the coloring scheme..
             
             if color_arg == 'cycle': # Use a 4-color rotating cycle
-                color = [ color_cycle[i%4] for i in xrange(self.n) ]
+                color = [ color_cycle[i%4] for i in range(self.n) ]
 
             elif color_arg == 'hmm': # coloring by HMM hidden state
                 color = hmm_color_cycle
@@ -262,7 +262,7 @@ class Event(Segment):
 
         # Otherwise plot them one segment at a time, colored appropriately.
         else:
-            for c, segment, l in it.izip_longest( color, self.segments, labels ):
+            for c, segment, l in it.zip_longest( color, self.segments, labels ):
                 plt.plot( np.arange(0, len( segment.current ) )/self.second + segment.start, 
                     segment.current, color=c, label=l, **kwargs )
 
@@ -272,7 +272,7 @@ class Event(Segment):
 
             # If plotting the lines, plot the transitions from one segment to another
             if lines:
-                for seg, next_seg in it.izip( self.segments[:-1], self.segments[1:] ):
+                for seg, next_seg in it.zip( self.segments[:-1], self.segments[1:] ):
                     plt.plot( [seg.end, seg.end], [ seg.mean, next_seg.mean ], **line_kwargs )
 
         # If labels have been passed in, then add the legend.

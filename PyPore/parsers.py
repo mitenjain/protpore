@@ -8,18 +8,18 @@
 
 from __future__ import division, print_function
 import sys
-from itertools import tee,izip,chain
+from itertools import tee,chain
 import re
 from math import log
 import PyPore
 import time
 import numpy as np
 try:
-    from PyQt4 import QtGui as Qt
-    from PyQt4 import QtCore as Qc
+    from PyQt5 import QtGui as Qt
+    from PyQt5 import QtCore as Qc
 except:
     pass
-from core import *
+from PyPore.core import *
 
 import pyximport
 pyximport.install( setup_args={'include_dirs':np.get_include()})
@@ -119,7 +119,7 @@ class MemoryParse( object):
     def parse( self, current ):
         return [ Segment( current=np.array(current[int(s):int(e)], copy=True),
                           start=s,
-                          duration=(e-s) ) for s, e in izip(self.starts, self.ends)]
+                          duration=(e-s) ) for s, e in zip(self.starts, self.ends)]
 
 class lambda_event_parser( parser ):
     '''
@@ -156,7 +156,7 @@ class lambda_event_parser( parser ):
     
     def GUI( self ):
         '''
-        Override the default GUI for use in the Abada GUI, allowing for customization of the rules and threshol via
+        Override the default GUI for use in the Abada GUI, allowing for customization of the rules and threshold via
         the GUI. 
         '''
         threshDefault, timeDefault = "90", "1"
@@ -215,7 +215,7 @@ def pairwise(iterable):
     "s -> (s0,s1), (s1,s2), (s2, s3), ..."
     a, b = tee(iterable)
     next(b, None)
-    return izip(a, b)
+    return zip(a, b)
 
 class StatSplit( parser ):
     """
@@ -299,8 +299,8 @@ class StatSplit( parser ):
             return segments
 
         lrs = [self._lr(pair[0],pair[1]) for pair in paired]
-        lefts = [alpha+beta*s for (alpha,beta,var),(s,e) in izip(lrs,paired)]
-        rights = [alpha+beta*e for (alpha,beta,var),(s,e) in izip(lrs,paired)]
+        lefts = [alpha+beta*s for (alpha,beta,var),(s,e) in zip(lrs,paired)]
+        rights = [alpha+beta*e for (alpha,beta,var),(s,e) in zip(lrs,paired)]
         segments = [ Segment( current=current[start:end],
                               start=start,
                               duration=(end-start) ) for start,end in paired ]
@@ -399,7 +399,7 @@ class StatSplit( parser ):
                 else np.log(self._var_c(start,end)))
         max_gain=self.min_gain_per_sample*self.window_width
         x=None
-        for i in xrange(start+self.min_width,end+1-self.min_width):
+        for i in range(start+self.min_width,end+1-self.min_width):
             low_var_summed = (i-start)*( self._var_c(start,i) if not self.use_log
                     else np.log(self._var_c(start,i)))
             high_var_summed = (end-i)*( self._var_c(i,end) if not self.use_log
@@ -444,7 +444,7 @@ class StatSplit( parser ):
             else log(self._lr(start,end)[2]))
         max_gain=self.min_gain_per_sample*self.window_width
         x=None
-        for i in xrange(start+self.min_width,end+1-self.min_width):
+        for i in range(start+self.min_width,end+1-self.min_width):
             low_var_summed = (i-start)*(self._lr(start,i)[2] if not self.use_log
                 else log(self._lr(start,i)[2]))
             high_var_summed = (end-i)*(self._lr(i,end)[2] if not self.use_log
@@ -476,7 +476,7 @@ class StatSplit( parser ):
         # scan in overlapping windows to find a spliting point
         split_pair = None
         pseudostart = start
-        for pseudostart in xrange(start, end-2*self.min_width, self.window_width//2 ):
+        for pseudostart in range(start, end-2*self.min_width, self.window_width//2 ):
             if pseudostart> start+ self.max_width:
             # scanned a long way with no splits, add a fake one at max_width
                 split_at = min(start+self.max_width, end-self.min_width)
@@ -508,7 +508,7 @@ class SpeedyStatSplit( parser ):
     wrapper for the cyton implementation to add a GUI.
     '''
 
-    def __init__( self, min_width=100, max_width=1000000, window_width=10000, 
+    def __init__( self, min_width=100, max_width=1000000, window_width=10000,
         min_gain_per_sample=None, false_positive_rate=None,
         prior_segments_per_second=None, sampling_freq=1.e5, cutoff_freq=None ):
 
@@ -522,7 +522,7 @@ class SpeedyStatSplit( parser ):
         self.cutoff_freq = cutoff_freq
 
     def parse( self, current ):
-        parser = FastStatSplit( self.min_width, self.max_width, 
+        parser = FastStatSplit( self.min_width, self.max_width,
             self.window_width, self.min_gain_per_sample, self.false_positive_rate,
             self.prior_segments_per_second, self.sampling_freq, self.cutoff_freq )
         return parser.parse( current )
@@ -583,11 +583,11 @@ class snakebase_parser( parser ):
         # Find the places where the derivative is low
         tics = np.concatenate( ( [0], np.where( diff < 1e-3 )[0], [ diff.shape[0] ] ) )
         # For pieces between these tics, make each point the cumulative sum of that piece and put it together piecewise
-        cumsum = np.concatenate( ( [ np.cumsum( diff[ tics[i] : tics[i+1] ] ) for i in xrange( tics.shape[0]-1 ) ] ) )
+        cumsum = np.concatenate( ( [ np.cumsum( diff[ tics[i] : tics[i+1] ] ) for i in range( tics.shape[0]-1 ) ] ) )
         # Find the edges where the cumulative sum passes a threshold
         split_points = np.where( np.abs( np.diff( np.where( cumsum > self.threshold, 1, 0 ) ) ) == 1 )[0] + 1
         # Return segments which do pass the threshold
-        return [ Segment( current = current[ tics[i]: tics[i+1] ], start = tics[i] ) for i in xrange( 1, tics.shape[0] - 1, 2 ) ]
+        return [ Segment( current = current[ tics[i]: tics[i+1] ], start = tics[i] ) for i in range( 1, tics.shape[0] - 1, 2 ) ]
 
     def GUI( self ):
         threshDefault = "1.5"
@@ -645,7 +645,7 @@ class FilterDerivativeSegmenter( parser ):
         # threshold, with a maximum of one per block 
         split_points = [0] 
 
-        for start, end in it.izip( tics[:-1:2], tics[1::2] ): # For all pairs of edges for a block..
+        for start, end in it.zip( tics[:-1:2], tics[1::2] ): # For all pairs of edges for a block..
             segment = deriv[ start:end ] # Save all derivatives in that block to a segment
             if np.argmax( segment ) > self.high_threshold: # If the maximum derivative in that block is above a threshold..
                 split_points = np.concatenate( ( split_points, [ start, end ] ) ) # Save the edges of the segment 
@@ -653,7 +653,7 @@ class FilterDerivativeSegmenter( parser ):
         tics = np.concatenate( ( split_points, [ current.shape[0] ] ) )
         tics = map( int, tics )
         return [ Segment( current=current[ tics[i]:tics[i+1] ], start=tics[i] ) 
-                    for i in xrange( 0, len(tics)-1, 2 ) ]
+                    for i in range( 0, len(tics)-1, 2 ) ]
 
     def GUI( self ):
         lowThreshDefault = "1e-2"

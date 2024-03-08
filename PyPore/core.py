@@ -17,7 +17,7 @@ class MetaSegment( object ):
 	loaded, without the expectation of the array of floats.
 	'''
 	def __init__( self, **kwargs ):
-		for key, value in kwargs.iteritems():
+		for key, value in kwargs.items():
 			with ignored( AttributeError ):
 				setattr( self, key, value )
 
@@ -108,7 +108,7 @@ class MetaSegment( object ):
 				json = ''.join([ line for line in infile ])
 
 		words = re.findall( r"\[[\w'.-]+\]|[\w'.-]+", json )
-		attrs = { words[i]: words[i+1] for i in xrange(0, len(words), 2) }
+		attrs = { words[i]: words[i+1] for i in range(0, len(words), 2) }
 
 		return MetaSegment( **attrs )
 
@@ -127,7 +127,7 @@ class Segment( object ):
 		'''
 		self.current = current
 
-		for key, value in kwargs.iteritems():
+		for key, value in kwargs.items():
 			if hasattr( self, key ):
 				continue
 			with ignored( AttributeError ):
@@ -241,7 +241,7 @@ class Segment( object ):
 			return MetaSegment.from_json( json=json )
 
 		words = re.findall( r"\[[\w\s'.-]+\]|[\w'.-]+", json )
-		attrs = { words[i]: words[i+1] for i in xrange(0, len(words), 2) }
+		attrs = { words[i]: words[i+1] for i in range(0, len(words), 2) }
 
 		current = np.array([ float(x) for x in attrs['current'][1:-1].split() ])
 		del attrs['current']
